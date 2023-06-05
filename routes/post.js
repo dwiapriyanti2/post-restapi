@@ -12,11 +12,11 @@ function result(succ, msg, details) {
     } else {
         return {
             success: succ,
-            message: msg
+            message: msg,
         }
     }
-}
 
+}
 router.get('/', async (req, res) => {
     try {
         const post = await Post.aggregate([{
@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
                     username: {
                         $arrayElemAt: ['$userData.username', 0]
                     },
-                    created_date: {
+                    create_date: {
                         $dateToString: {
                             format: '%d-%m-%Y %H:%M:%S',
                             date: '$created_date',
@@ -47,7 +47,9 @@ router.get('/', async (req, res) => {
                             timezone: '+07:00'
                         }
                     }
+
                 }
+
             },
             {
                 $project: {
@@ -55,27 +57,26 @@ router.get('/', async (req, res) => {
                     _id: 0
                 }
             }
-        ]);
 
+        ]);
         if (post.length > 0) {
-            res.status(200).json(result(1, 'Retrieve Data Sucess!', post))
+            res.status(200).json(result(1, 'Retrieve Data Success', post))
         } else {
-            res.status(200).json(result(0, 'Zero Data!'))
+            res.status(404).json(result(0, 'Zero Data!'))
         }
     } catch (error) {
         res.status(500).json(result(0, error.message))
     }
 })
-
 router.post('/', async (req, res) => {
     const inputPost = new Post({
         content: req.body.content,
         user_id: req.body.user_id
     })
-
     try {
         const post = await inputPost.save()
-        res.status(200).json(result(1, 'Insert Post Success!'))
+        res.status(200).json(result(1, 'Insert Post Successful'))
+
     } catch (error) {
         res.status(500).json(result(0, error.message))
     }
@@ -87,36 +88,34 @@ router.put('/', async (req, res) => {
         content: req.body.content,
         modified_date: Date.now()
     }
-
     try {
         const post = await Post.updateOne({
-            _id: data.id
+            _id: data.id,
         }, data)
 
         if (post.matchedCount > 0) {
-            res.status(200).json(result(1, 'Update Post Success!'))
+            res.status(200).json(result(1, 'Updated Post Success!'))
         } else {
-            res.status(200).json(result(0, 'Update Post Failed!'))
+            res.status(200).json(result(1, 'Updated Post Failed!'))
         }
+
     } catch (error) {
         res.status(500).json(result(0, error.message))
     }
 })
-
 router.delete('/:id', async (req, res) => {
     try {
         const post = await Post.deleteOne({
             _id: req.params.id
         })
-
         if (post.deletedCount > 0) {
-            res.status(200).json(result(1, 'Delete Post Success!'))
+            res.status(200).json(result(1, 'Deleted Post Success!'))
         } else {
-            res.status(200).json(result(0, 'Delete Post Failed!'))
+            res.status(200).json(result(0, 'Deleted Post Failed!'))
         }
     } catch (error) {
         res.status(500).json(result(0, error.message))
     }
-})
 
-module.exports = router
+})
+module.exports = router

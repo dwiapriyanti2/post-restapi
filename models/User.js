@@ -1,11 +1,11 @@
 const mongoose = require('mongoose')
-const moment = require('moment')
 
 const userSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
         max: 45
+
     },
     password: {
         type: String,
@@ -21,21 +21,9 @@ const userSchema = mongoose.Schema({
         type: Date,
         default: null
     }
+
+
 }, {
     versionKey: false
 })
-
-userSchema.method('toJSON', function () {
-    const {
-        _id,
-        ...object
-    } = this.toObject()
-    object.id = _id
-    object.created_date = moment(object.created_date).format('DD-MM-YYYY HH:mm:ss')
-    if (object.modified_date != null) {
-        object.modified_date = moment(object.modified_date).format('DD-MM-YYYY HH:mm:ss')
-    }
-    return object
-})
-
-module.exports = mongoose.model('User', userSchema, 'user')
+module.exports = mongoose.model('User', userSchema, 'user')
